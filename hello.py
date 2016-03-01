@@ -8,10 +8,11 @@ def wsgi_app(env, start_response):
   header = [('Content-Type', 'text/plain')]
 
   body = []
-  str = parse_qs(env['QUERY_STRING', keep_blank_values=True])
+  str = parse_qs(env['QUERY_STRING'], keep_blank_values=True)
   for key in str:
     for val in key:
-      body.append(key, '=', val)
+      data = key + '=' + val
+      body.append(data)
 
 
   start_response(status, header)

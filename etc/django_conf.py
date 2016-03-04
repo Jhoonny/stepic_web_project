@@ -1,8 +1,8 @@
-
+"""
 CONFIG = {
     'mode': 'django',
     'environment': {
-            'PYTHONPATH': '/path/to/custom/python/packages',
+     'PYTHONPATH': '/path/to/custom/python/packages',
      },
      'working_dir': '/home/box/web/',
      'user': 'www-data',
@@ -15,9 +15,9 @@ CONFIG = {
         'settings',
     ),
 }
+
 """
 bind = "0.0.0.0:8000"
 
 if __name__ == '__main__':
     pass
-"""

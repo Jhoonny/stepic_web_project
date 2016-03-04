@@ -11,7 +11,7 @@ sudo /etc/init.d/nginx restart
 sudo ln -sf /home/box/web/etc/gunicorn_conf.py   /etc/gunicorn.d/test
 sudo /etc/init.d/gunicorn restart
 
-gunicorn -c etc/gunicorn_conf.py.conf hello:wsgi_ap &
+gunicorn -c etc/gunicorn_conf.py hello:wsgi_ap &
 
 cd ask
 gunicorn -c ../etc/django_conf.py ask.wsgi --pythonpath '/home/box/web/ask' &

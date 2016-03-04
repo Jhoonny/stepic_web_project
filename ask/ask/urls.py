@@ -16,15 +16,15 @@ urlpatterns =(\
 """
 from django.conf.urls import url
 from django.contrib import admin
-from qa import views
+from qa.views import bad_route, test
 
 urlpatterns = [
-    url(r'^$', views.test),
-    url(r'login/$', views.test),
-    url(r'signup/$', views.test),
-    url(r'question/([1-9]+)/$', views.test),
-    url(r'ask/$', views.test),
-    url(r'popular/$', views.test),
-    url(r'new/$', views.test),
+    url(r'^$', test),
+    url(r'^login/', test),
+    url(r'^signup/', test),
+    url(r'^question/(?P<id>[^/]+)', test),
+    url(r'^ask/', test),
+    url(r'^popular/', test),
+    url(r'^new/', test),
     url(r'^admin/', admin.site.urls),
 ]

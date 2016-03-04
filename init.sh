@@ -10,3 +10,8 @@ sudo /etc/init.d/nginx restart
 
 sudo ln -sf /home/box/web/etc/gunicorn.conf   /etc/gunicorn.d/test
 sudo /etc/init.d/gunicorn restart
+
+gunicorn -c etc/gunicorn.conf hello:wsgi_ap &
+
+cd ask
+gunicorn -c ../etc/django.conf ask.wsgi --pythonpath '/home/box/web/ask'

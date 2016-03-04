@@ -20,9 +20,9 @@ urlpatterns = [
     url(r'', sites.urls),
     url(r'^login/', login.site.urls),
     url(r'^signup/', signup.site.urls),
-    url(r'^question/{}/', admin.site.urls),
-    url(r'^ask/', admin.site.urls),
-    url(r'^popular/', admin.site.urls),
-    url(r'^new/', admin.site.urls),
+    url(r'^question/{}/', question.site.urls),
+    url(r'^ask/', ask.site.urls),
+    url(r'^popular/', popular.site.urls),
+    url(r'^new/', new.site.urls),
 
 ]

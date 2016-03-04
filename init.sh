@@ -12,11 +12,3 @@ sudo ln -sf /home/box/web/etc/gunicorn_conf.py   /etc/gunicorn.d/test
 sudo ln -sf /home/box/web/etc/gunicorn_conf_ask.py /etc/gunicorn.d/ask
 sudo /etc/init.d/gunicorn restart
 
-#gunicorn -c etc/gunicorn_conf.py hello:wsgi_app &
-
-#cd ask
-#gunicorn -c ../etc/django_conf.py ask.wsgi --pythonpath '/home/box/web/ask' &
-
-#sudo /etc/init.d/gunicorn restart
-#cd ../ask
-#python manage.py runserver

@@ -14,17 +14,15 @@ urlpatterns =(\
   url("^new/$",  views.get_questions, name="new", kwargs={"question_type": "new"})
 )
 """
-from django.conf.urls import url
-from django.contrib import admin
-from qa.views import bad_route, test
+from django.conf.urls import url, patterns
+from qa.views import test
 
-urlpatterns = [
-    url(r'^$', test),
-    url(r'^login/', test),
-    url(r'^signup/', test),
-    url(r'^question/(?P<id>[^/]+)', test),
-    url(r'^ask/', test),
-    url(r'^popular/', test),
-    url(r'^new/', test),
-    url(r'^admin/', admin.site.urls),
-]
+urlpatterns = patterns('',
+   url(r'^$', test, name='test'),
+   url(r'^login/', test, name='login'),
+   url(r'^signup/', test, name='signup'),
+   url(r'^question/\d+/', test, name='question'),
+   url(r'^ask/', test, name='aks'),
+   url(r'^popular/', test, name='popular'),
+   url(r'^new/', test, name='new'),
+)

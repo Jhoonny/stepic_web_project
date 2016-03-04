@@ -15,3 +15,6 @@ gunicorn -c etc/gunicorn_conf.py.conf hello:wsgi_ap &
 
 cd ask
 gunicorn -c ../etc/django_conf.py ask.wsgi --pythonpath '/home/box/web/ask' &
+
+# cd ../ask
+# python manage.py runserver

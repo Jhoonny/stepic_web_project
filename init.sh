@@ -18,5 +18,5 @@ cd ask
 gunicorn -c ../etc/django_conf.py ask.wsgi --pythonpath '/home/box/web/ask' &
 
 sudo /etc/init.d/gunicorn restart
-# cd ../ask
-# python manage.py runserver
+cd ../ask
+python manage.py runserver 0.0.0.0:8000

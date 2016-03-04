@@ -1,3 +1,4 @@
+"""
 CONFIG = {
     'mode': 'django',
     'environment': {
@@ -7,10 +8,15 @@ CONFIG = {
      'user': 'www-data',
      'group': 'www-data',
      'args': (
-        '--bind=127.0.0.1:8000',
+        '--bind=0.0.0.0:8000',
         '--workers=4',
         '--timeout=30',
         '--log-file=/home/box/web/error_logs.log',
         'settings',
     ),
 }
+"""
+bind = "0.0.0.0:8000"
+
+if __name__ == '__main__':
+    pass

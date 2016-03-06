@@ -1,14 +1,13 @@
 from django.db import models
-# from django.contrib.auth import models
+from django.contrib.auth.models import User
 
-class Question(models.User):
+class Question(models.Model):
   title = models.CharField(max_length=255)
   text = models.TextField()
   added_at = models.DateTimeField(blank=True)
   rating = models.IntegerField()
   author = models.CharField(max_length=50)
-
-  likes = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
+  likes = models.ManyToManyField(User)
 
   def __unicode__(self):
     return self.title
@@ -20,11 +19,8 @@ class Question(models.User):
     ordering = ['-creation_date']
 
 
-class Answer(models.User):
+class Answer(models.Model):
   text = models.TextField()
   added_at = models.DateTimeField(blank=True)
   author = models.CharField(max_length=50)
-  question =
-
-  status = models.OneToOneField(PostStatus)
-  tags = models.ManyToManyField(Tag)
+  question = models.ForeignKey(Question)

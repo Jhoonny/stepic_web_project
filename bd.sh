@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-mysql -u root -e "create database db_qa"
+sudo /etc/init.d/mysql restart
+mysql -uroot -e "CREATE DATABASE qa"
+mysql -uroot -e "CREATE USER 'qa'@'localhost' IDENTIFIED BY PASSWORD 'qa'"
+mysql -uroot -e "GRANT ALL qa.* TO 'qa'@'localhost'"
 
-cd ask
-./manage.py syncdb
-./manage.py validate
+python /home/box/web/ask/manage.py syncdb
+python /home/box/web/ask/manage.py validate

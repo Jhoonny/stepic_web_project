@@ -12,5 +12,5 @@ sudo ln -sf /home/box/web/etc/gunicorn_conf.py   /etc/gunicorn.d/test
 sudo ln -sf /home/box/web/etc/gunicorn_conf_ask.py /etc/gunicorn.d/ask
 sudo /etc/init.d/gunicorn restart
 
-bash ./db_init.sh
-bash ./db_create.sh
+#bash ./db_init.sh
+#bash ./db_create.sh

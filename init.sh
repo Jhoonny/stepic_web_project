@@ -15,5 +15,5 @@ sudo /etc/init.d/nginx restart
 #bash ./db_init.sh
 #bash ./db_create.sh
 
-gunicorn -c etc/gunicorn_conf.py hello:application &
+gunicorn -c etc/gunicorn_conf.py hello:wsgi_app &
 gunicorn -c etc/gunicorn_conf_ask.py ask.wsgi --pythonpath '/home/box/web/ask' &

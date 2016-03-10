@@ -1,129 +1,123 @@
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-
-from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator, EmptyPage
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 
-try:
-    from stepic_web.ask.qa.models import Question, Answer
-    from stepic_web.ask.qa.forms import AskForm, AnswerForm
-except ImportError:
-    import sys
-    sys.path.append("/home/box")
-    from web.ask.qa.models import Question, Answer
-    from web.ask.qa.forms import AskForm, AnswerForm
+from .models import Question, Answer
+from .forms import AskForm, AnswerForm
 
-LIMIT = 10
-
-
-def panginate(request, qs):
-    try:
-        page_num = int(request.GET.get("page", 1))
-    except ValueError:
-        raise Http404
-
-    paginator = Paginator(qs, LIMIT)
-
-    try:
-        page = paginator.page(page_num)
-    except EmptyPage:
-        page = paginator.page(paginator.num_pages)
-    return page_num, page
-
-
-def build_url(name, url_params):
-    try:
-        url = reverse(name)
-    except NoReverseMatch:
-        url = name
-
-    if url_params:
-        url += '?' + urlencode(url_params)
-    return url
+from django.core.paginator import Paginator
 
 
 def test(request, *args, **kwargs):
-    return render(request, "base.html")
+    return HttpResponse("OK")
 
 
-def get_questions(request, question_type):
-    new_questions = Question.objects.get_questions_by_type(question_type)
-    page_num, page = panginate(request, new_questions)
+def signup(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = User.objects.create_user(username, email, password)
 
-    next_page_ref = build_url(question_type, {"page": page_num+1}) if page.has_next() else request.path
-    prev_page_ref = build_url(question_type, {"page": page_num-1}) if page.has_previous() else request.path
-    return render(request, "question_list.html", {"questions": page.object_list, "next_page_ref": next_page_ref,
-                                                  "prev_page_ref": prev_page_ref})
-
-# disable csrf defence, put it here just for stepic.org
-@csrf_exempt
-def get_current_question(request, id):
-    question = get_object_or_404(Question, id=id)
-    answers = Answer.objects.filter(question=question)
-
-    user = User.objects.first()
-    if request.method == "POST":
-        text = request.POST["text"]
-        question = request.POST["question"]
-        form = AnswerForm(user, text=text, question=question)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(request.path)
+        user_auth = authenticate(username=username, password=password)
+        login(request, user_auth)
+        return HttpResponseRedirect('/')
     else:
-        form = AnswerForm(user, question=id)
-    return render(request, "current_question.html", {"question": question, "answers": answers, "form": form})
+        return render(request, 'signup.html')
 
-# disable csrf defence, put it here just for stepic.org
-@csrf_exempt
-def ask_question(request):
-    user = User.objects.first()
-    if request.method == "POST":
-        text = request.POST["text"]
-        title = request.POST["title"]
-        form = AskForm(user, text=text, title=title)
+
+def login_user(request):
+    error = ''
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect('/')
+        else:
+            error = 'Invalid username/password'
+            return HttpResponseRedirect('/login/', {'error': error,})
+    else:
+        return render(request, 'login.html')
+
+
+def logout_user(request):
+    logout(request)
+    return HttpResponseRedirect('/')
+
+
+def index(request):
+    quests = Question.objects.order_by('-id')
+    limit = 10
+    paginator = Paginator(quests, limit)
+
+    page = request.GET.get('page', 1)
+    quests = paginator.page(page)
+    paginator.baseurl = '/?page='
+
+    user = request.user
+
+    return render(request, 'index.html', {
+        'quest_list': quests,
+        'paginator': paginator,
+        'page': page,
+        'user': user,
+    })
+
+
+def popular_quests(request):
+    quests = Question.objects.order_by('-rating')
+    limit = 10
+    paginator = Paginator(quests, limit)
+
+    page = request.GET.get('page', 1)
+    quests = paginator.page(page)
+    paginator.baseurl = '/popular/?page='
+
+    return render(request, 'popular.html', {
+        'quest_list': quests,
+        'paginator': paginator,
+        'page': page,
+    })
+
+
+def one_quest(request, id):
+    id = int(id)
+    try:
+        quest = Question.objects.get(pk=id)
+    except Question.DoesNotExist:
+        raise Http404
+    return render(request, 'details.html', {
+        'quest': quest,
+    })
+
+
+def ask_add(request):
+    if request.method == 'POST':
+        form = AskForm(request.POST)
+        form._user = request.user
         if form.is_valid():
-            question = form.save()
-            url = question.get_url()
+            ask = form.save()
+            url = '/question/{0}'.format(ask.id)
             return HttpResponseRedirect(url)
     else:
-        form = AskForm(user)
-    return render(request, "ask_question.html", {"form": form})
+        form = AskForm()
+    return render(request, 'add_ask.html', {
+        'form': form,
+    })
 
 
-"""
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, Http404, HttpRequest
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage
-from django.views.decorators.http import require_GET
-from ask.qa.models import Question, Answer
-
-def test(request, *args, **kwargs):
-  return HttpResponse('OK')
-  # return render(request, "base.html")
-
-def post_text(request):
-  try:
-    id = request.GET.get('id')
-    obj = Post.objects.get(pk=id)
-  except Post.DoesNotExist:
-    raise Http404
-  return HttpResponse(obj.text, content_type='text/plain')
-
-@require_GET
-def question_list(request):
-  try:
-    ask = Question.objects.get()
-  except Question.DoesNotExist:
-    raise Http404
-  return render(request, 'ask/ask_list.html', {
-    'ask': ask
-  })
-
-"""
+def answer_add(request):
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save()
+            url = '/question/{0}'.format(answer.question_id)
+            return HttpResponseRedirect(url)
+    else:
+        form = AnswerForm()
+    return render(request, 'add_answer.html', {
+        'form': form,
+    })

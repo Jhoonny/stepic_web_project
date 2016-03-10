@@ -2,6 +2,15 @@ from django.db import models
 from django.http import Http404
 from django.contrib.auth.models import User
 
+class QuestionManager(models.Manager):
+  def get_questions_by_type(self, question_type):
+    if question_type == "" or question_type == "new":
+      return self.order_by("-added_at", "-id")
+    elif question_type == "popular":
+      return self.order_by("-rating", "-id")
+    else:
+      raise Http404
+
 class Question(models.Model):
   title = models.CharField(max_length=255)
   text = models.TextField()
@@ -31,11 +40,3 @@ class Answer(models.Model):
   def __str__(self):
     return self.text
 
-class QuestionManager(models.Manager):
-    def get_questions_by_type(self, question_type):
-        if question_type == "" or question_type == "new":
-            return self.order_by("-added_at", "-id")
-        elif question_type == "popular":
-            return self.order_by("-rating", "-id")
-        else:
-            raise Http404

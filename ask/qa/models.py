@@ -14,7 +14,7 @@ class Question(models.Model):
     return self.title
 
   def get_absolute_url(self):
-    return '/question/%d/' % self.id
+    return "/question/%d/" % self.id
 
   class Meta:
     db_table = 'question'
@@ -30,3 +30,11 @@ class Answer(models.Model):
   def __unicode__(self):
     return self.text
 
+class QuestionManager(models.Manager):
+    def get_questions_by_type(self, question_type):
+        if question_type == "" or question_type == "new":
+            return self.order_by("-added_at", "-id")
+        elif question_type == "popular":
+            return self.order_by("-rating", "-id")
+        else:
+            raise Http404

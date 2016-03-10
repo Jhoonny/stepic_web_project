@@ -5,10 +5,10 @@ from django.contrib.auth.models import User
 class Question(models.Model):
   title = models.CharField(max_length=255)
   text = models.TextField()
-  added_at = models.DateTimeField(null=False, auto_now_add=True)
-  rating = models.IntegerField(null=False, default=0)
-  author = models.ForeignKey(User, related_name='question_author', null=True)
-  likes = models.ManyToManyField(User, related_name='question_likes', null=True)
+  added_at = models.DateField(auto_now=True)
+  rating = models.IntegerField(default=0)
+  author = models.ForeignKey(User, related_name="question_author", null=True)
+  likes = models.ManyToManyField(User, related_name="question_likes", null=True)
 
   def __unicode__(self):
     return self.title
@@ -20,14 +20,15 @@ class Question(models.Model):
     db_table = 'question'
     ordering = ['-creation_date']
 
+  objects = QuestionManager()
 
 class Answer(models.Model):
   text = models.TextField()
-  added_at = models.DateTimeField(null=False, auto_now_add=True)
+  added_at = models.DateField(auto_now=True)
   question = models.ForeignKey(Question)
-  author = models.ForeignKey(User, related_name='answer_author', null=True)
+  author = models.ForeignKey(User, related_name="answer_author", null=True)
 
-  def __unicode__(self):
+  def __str__(self):
     return self.text
 
 class QuestionManager(models.Manager):

@@ -1,3 +1,4 @@
+"""
 CONFIG = {
     'mode': 'wsgi',
     'working_dir': '/home/box/web/ask/ask',
@@ -10,4 +11,5 @@ CONFIG = {
         'wsgi',
     ),
 }
-
+"""
+bind = "0.0.0.0:80"

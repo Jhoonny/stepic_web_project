@@ -100,7 +100,7 @@ def ask_add(request):
         form._user = request.user
         if form.is_valid():
             ask = form.save()
-            url = '/question/{0}'.format(ask.id)
+            url = '/ask/{0}'.format(ask.id)
             return HttpResponseRedirect(url)
     else:
         form = AskForm()

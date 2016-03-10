@@ -11,7 +11,7 @@
 #sudo mysqld &
 
 sudo mysql -uroot -e "create database if not exists ask_db"
-sudo mysql -uroot -e "grant all on ask_db.* to 'as'@'localhost' identified by 'as'"
+#sudo mysql -uroot -e "grant all on ask_db.* to 'as'@'localhost' identified by 'as'"
 
 python /home/box/web/ask/manage.py syncdb
 python /home/box/web/ask/manage.py validate

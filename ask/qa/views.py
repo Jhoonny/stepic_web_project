@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Question, Answer
 from .forms import AskForm, AnswerForm
@@ -82,7 +83,7 @@ def popular_quests(request):
         'page': page,
     })
 
-
+@csrf_exempt
 def one_quest(request, id):
     id = int(id)
     try:
@@ -93,7 +94,7 @@ def one_quest(request, id):
         'quest': quest,
     })
 
-
+@csrf_exempt
 def ask_add(request):
     if request.method == 'POST':
         form = AskForm(request.POST)
@@ -108,7 +109,7 @@ def ask_add(request):
         'form': form,
     })
 
-
+@csrf_exempt
 def answer_add(request):
     if request.method == 'POST':
         form = AnswerForm(request.POST)

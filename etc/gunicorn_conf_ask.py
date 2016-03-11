@@ -3,7 +3,7 @@ CONFIG = {
     'working_dir': '/home/box/web/ask/',
     'python': '/usr/bin/python',
     'args': (
-        '--bind=0.0.0.0:80',
+        '--bind=0.0.0.0:8000',
         '--workers=1',
         '--timeout=60',
         '--log-file=/home/box/web/error2_logs.log',

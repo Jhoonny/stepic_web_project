@@ -10,7 +10,7 @@ class AskForm(forms.Form):
         cleaned_data = super(AskForm, self).clean()
 
     def save(self):
-        self.cleaned_data['author'] = self._user
+        self.cleaned_data['author'] = self.user
         return Question.objects.create(**self.cleaned_data)
 
 
@@ -22,5 +22,5 @@ class AnswerForm(forms.Form):
         cleaned_data = super(AnswerForm, self).clean()
 
     def save(self):
-        self.cleaned_data['author'] = self._user
+        self.cleaned_data['author'] = self.user
         return Answer.objects.create(**self.cleaned_data)

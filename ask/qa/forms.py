@@ -1,26 +1,34 @@
-from .models import Answer, Question, User
+from .models import Answer, Question
 from django import forms
 
 
 class AskForm(forms.Form):
-    title = forms.CharField(max_length=255)
-    text = forms.CharField(widget=forms.Textarea)
+  title = forms.CharField(max_length=255)
+  text = forms.CharField(widget=forms.Textarea)
 
-    def clean(self):
-        cleaned_data = super(AskForm, self).clean()
+  def __init__(self, user=None, **kwargs):
+    self.user = user
+    super(AskForm, self).__init__(kwargs)
 
-    def save(self):
-        self.cleaned_data['author'] = self.user
-        return Question.objects.create(**self.cleaned_data)
+  def clean(self):
+    cleaned_data = super(AskForm, self).clean()
+
+  def save(self):
+    self.cleaned_data['author'] = self.user
+    return Question.objects.create(**self.cleaned_data)
 
 
 class AnswerForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea)
-    question = forms.ModelChoiceField(queryset=Question.objects.all())
+  text = forms.CharField(widget=forms.Textarea)
+  question = forms.ModelChoiceField(queryset=Question.objects.all())
 
-    def clean(self):
-        cleaned_data = super(AnswerForm, self).clean()
+  def __init__(self, user=None, **kwargs):
+    self.user = user
+    super(AnswerForm, self).__init__(kwargs)
 
-    def save(self):
-        self.cleaned_data['author'] = self.user
-        return Answer.objects.create(**self.cleaned_data)
+  def clean(self):
+    cleaned_data = super(AnswerForm, self).clean()
+
+  def save(self):
+    self.cleaned_data['author'] = self.user
+    return Answer.objects.create(**self.cleaned_data)

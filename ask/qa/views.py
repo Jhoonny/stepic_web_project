@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 def test(request, *args, **kwargs):
     return HttpResponse("OK")
 
-
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -27,7 +27,7 @@ def signup(request):
     else:
         return render(request, 'signup.html')
 
-
+@csrf_exempt
 def login_user(request):
     error = ''
     if request.method == 'POST':
@@ -48,7 +48,7 @@ def logout_user(request):
     logout(request)
     return HttpResponseRedirect('/')
 
-
+@csrf_exempt
 def index(request):
     quests = Question.objects.order_by('-id')
     limit = 10
@@ -67,7 +67,7 @@ def index(request):
         'user': user,
     })
 
-
+@csrf_exempt
 def popular_quests(request):
     quests = Question.objects.order_by('-rating')
     limit = 10

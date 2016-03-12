@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-
-python ask/manage.py runserver
+sudo /etc/init.d/nginx stop
+sudo python ~/web/ask/manage.py runserver 0.0.0.0:80

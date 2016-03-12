@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from .models import Question, Answer
 from .forms import AskForm, AnswerForm
@@ -14,7 +14,7 @@ def test(request, *args, **kwargs):
   return HttpResponse("OK")
 
 
-@csrf_exempt
+@csrf_protect
 def signup(request):
   if request.method == 'POST':
     username = request.POST.get('username')
@@ -29,7 +29,7 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-
+@csrf_protect
 def login_user(request):
   error = ''
   if request.method == 'POST':
@@ -100,7 +100,7 @@ def one_quest(request, id):
   })
 
 
-
+@csrf_protect
 def ask_add(request):
   if request.method == 'POST':
     form = AskForm(request.POST)
@@ -117,7 +117,7 @@ def ask_add(request):
   })
 
 
-
+@csrf_protect
 def answer_add(request):
   if request.method == 'POST':
     form = AnswerForm(request.POST)

@@ -12,7 +12,6 @@
 
 {% if quest_list %}
     <h2>List Quest:</h2>
-    {% csrf_token %}
     <ul>
     {% for quest in quest_list %}
         <li>{{ quest.id }} - {{ quest.title }}</li>

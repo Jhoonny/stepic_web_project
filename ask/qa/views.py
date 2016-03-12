@@ -14,7 +14,7 @@ def test(request, *args, **kwargs):
   return HttpResponse("OK")
 
 
-@csrf_exempt
+
 def signup(request):
   if request.method == 'POST':
     username = request.POST.get('username')
@@ -29,7 +29,7 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-@csrf_exempt
+
 def login_user(request):
   error = ''
   if request.method == 'POST':
@@ -51,7 +51,7 @@ def logout_user(request):
   return HttpResponseRedirect('/')
 
 
-@csrf_exempt
+
 def index(request):
   quests = Question.objects.order_by('-id')
   limit = 10
@@ -71,7 +71,7 @@ def index(request):
   })
 
 
-@csrf_exempt
+
 def popular_quests(request):
   quests = Question.objects.order_by('-rating')
   limit = 10
@@ -88,7 +88,7 @@ def popular_quests(request):
   })
 
 
-@csrf_exempt
+
 def one_quest(request, id):
   id = int(id)
   try:
@@ -100,7 +100,7 @@ def one_quest(request, id):
   })
 
 
-@csrf_exempt
+
 def ask_add(request):
   if request.method == 'POST':
     form = AskForm(request.POST)
@@ -117,7 +117,7 @@ def ask_add(request):
   })
 
 
-@csrf_exempt
+
 def answer_add(request):
   if request.method == 'POST':
     form = AnswerForm(request.POST)

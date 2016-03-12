@@ -88,7 +88,7 @@ def popular_quests(request):
   })
 
 
-
+@csrf_protect
 def one_quest(request, id):
   id = int(id)
   try:
@@ -107,8 +107,8 @@ def ask_add(request):
     form._user = request.user
     if form.is_valid():
       ask = form.save()
-      url = '/question/{0}'.format(ask.id)
-      # url = ask.get_url()
+      # url = '/question/{0}'.format(ask.id)
+      url = ask.get_url()
       return HttpResponseRedirect(url)
   else:
     form = AskForm()

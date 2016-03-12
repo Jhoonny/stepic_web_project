@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+echo "Start and ini myqsl ..."
 sudo touch /var/run/mysqld/mysqld.sock
 sudo chown -R mysql /var/run/mysqld
 sudo /etc/init.d/mysql restart

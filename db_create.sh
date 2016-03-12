@@ -9,9 +9,9 @@
 #python /home/box/web/ask/manage.py validate
 
 #sudo mysqld &
-
+echo "Creade db .."
 sudo mysql -uroot -e "create database if not exists ask"
 #sudo mysql -uroot -e "grant all on ask.* to 'as'@'localhost' identified by 'as'"
-
+echo "Sync db ..."
 python /home/box/web/ask/manage.py syncdb
 python /home/box/web/ask/manage.py validate

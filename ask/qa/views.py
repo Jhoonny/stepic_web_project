@@ -14,7 +14,7 @@ def test(request, *args, **kwargs):
   return HttpResponse("OK")
 
 
-
+@csrf_exempt
 def signup(request):
   if request.method == 'POST':
     username = request.POST.get('username')

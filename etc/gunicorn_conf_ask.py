@@ -4,9 +4,9 @@ CONFIG = {
   'python': '/usr/bin/python',
   'args': (
     '--bind=0.0.0.0:80',
-    '--workers=1',
+    '--workers=16',
     '--timeout=60',
     '--log-file=/home/box/web/error2_logs.log',
-    'ask.wsgi',
+    'ask.wsgi:application',
   ),
 }

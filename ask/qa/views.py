@@ -107,8 +107,8 @@ def ask_add(request):
     form._user = request.user
     if form.is_valid():
       ask = form.save()
-      # url = '/ask/{0}'.format(ask.id)
-      url = ask.get_url()
+      url = '/question/{0}'.format(ask.id)
+      # url = ask.get_url()
       return HttpResponseRedirect(url)
   else:
     form = AskForm()
@@ -123,8 +123,8 @@ def answer_add(request):
     form = AnswerForm(request.POST)
     if form.is_valid():
       answer = form.save()
-      # url = '/question/{0}'.format(answer.question_id)
-      url = answer.get_url()
+      url = '/question/{0}'.format(answer.question_id)
+      # url = answer.get_url()
       return HttpResponseRedirect(url)
   else:
     form = AnswerForm()

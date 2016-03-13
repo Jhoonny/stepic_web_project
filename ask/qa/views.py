@@ -51,7 +51,6 @@ def logout_user(request):
   return HttpResponseRedirect('/')
 
 
-
 def index(request):
   quests = Question.objects.order_by('-id')
   limit = 10
@@ -71,7 +70,6 @@ def index(request):
   })
 
 
-
 def popular_quests(request):
   quests = Question.objects.order_by('-rating')
   limit = 10
@@ -84,7 +82,7 @@ def popular_quests(request):
   return render(request, 'popular.html', {
     'quest_list': quests,
     'paginator': paginator,
-    'page': page,
+    'page': page
   })
 
 
@@ -96,25 +94,42 @@ def one_quest(request, id):
   except Question.DoesNotExist:
     raise Http404
   return render(request, 'details.html', {
-    'quest': quest,
+    'quest': quest
   })
+
+
+  # @csrf_protect
+  # def ask_add(request):
+  #   if request.method == 'POST':
+  #     form = AskForm(request.POST)
+  #     form._user = request.user
+  #     if form.is_valid():
+  #       ask = form.save()
+  #       url = '/question/{0}'.format(ask.id)
+  #       # url = ask.get_url()
+  #       return HttpResponseRedirect(url)
+  #   else:
+  #     form = AskForm()
+  #   return render(request, 'add_ask.html', {
+  #     'form': form
+  #   })
 
 
 @csrf_protect
 def ask_add(request):
-  if request.method == 'POST':
-    form = AskForm(request.POST)
-    form._user = request.user
+  user = request.user
+  if request.method == "POST":
+    text = request.POST["text"]
+    title = request.POST["title"]
+    form = AskForm(user, text=text, title=title)
     if form.is_valid():
-      ask = form.save()
-      url = '/question/{0}'.format(ask.id)
-      # url = ask.get_url()
+      question = form.save()
+      url = question.get_url()
       return HttpResponseRedirect(url)
   else:
-    form = AskForm()
-  return render(request, 'add_ask.html', {
-    'form': form,
-  })
+    form = AskForm(user)
+
+  return render(request, "add_ask.html", {"form": form})
 
 
 @csrf_protect
@@ -129,5 +144,5 @@ def answer_add(request):
   else:
     form = AnswerForm()
   return render(request, 'add_answer.html', {
-    'form': form,
+    'form': form
   })

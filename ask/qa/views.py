@@ -98,38 +98,21 @@ def one_quest(request, id):
   })
 
 
-  # @csrf_protect
-  # def ask_add(request):
-  #   if request.method == 'POST':
-  #     form = AskForm(request.POST)
-  #     form._user = request.user
-  #     if form.is_valid():
-  #       ask = form.save()
-  #       url = '/question/{0}'.format(ask.id)
-  #       # url = ask.get_url()
-  #       return HttpResponseRedirect(url)
-  #   else:
-  #     form = AskForm()
-  #   return render(request, 'add_ask.html', {
-  #     'form': form
-  #   })
-
-
 @csrf_protect
 def ask_add(request):
-  user = request.user
-  if request.method == "POST":
-    text = request.POST["text"]
-    title = request.POST["title"]
-    form = AskForm(user, text=text, title=title)
+  if request.method == 'POST':
+    form = AskForm(request.POST)
+    form._user = request.user
     if form.is_valid():
-      question = form.save()
-      url = question.get_url()
+      ask = form.save()
+      url = '/question/{0}'.format(ask.id)
+      # url = ask.get_url()
       return HttpResponseRedirect(url)
   else:
-    form = AskForm(user)
-
-  return render(request, "add_ask.html", {"form": form})
+    form = AskForm()
+  return render(request, 'add_ask.html', {
+    'form': form
+  })
 
 
 @csrf_protect

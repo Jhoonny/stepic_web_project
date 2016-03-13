@@ -8,10 +8,10 @@ class AskForm(forms.Form):
 
   def __init__(self, user=None, **kwargs):
     self.user = user
-    super(AskForm, self).__init__(kwargs)
+    super(AskForm, self).__init__(*args, **kwargs)
 
-  def clean(self):
-    cleaned_data = super(AskForm, self).clean()
+  # def clean(self):
+  #   cleaned_data = super(AskForm, self).clean()
 
     # def save(self):
     #   self.cleaned_data['author'] = self.user
@@ -30,10 +30,10 @@ class AnswerForm(forms.Form):
 
   def __init__(self, user=None, **kwargs):
     self.user = user
-    super(AnswerForm, self).__init__(kwargs)
+    super(AnswerForm, self).__init__(*args, **kwargs)
 
-  def clean(self):
-    cleaned_data = super(AnswerForm, self).clean()
+  # def clean(self):
+  #   cleaned_data = super(AnswerForm, self).clean()
 
   # def save(self):
   #   self.cleaned_data['author'] = self.user

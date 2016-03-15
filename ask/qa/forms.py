@@ -1,45 +1,72 @@
+# -*- coding: utf-8 -*-
+
+"""
+
+"""
+
 from django import forms
-from qa.models import Question, Answer
 from django.contrib.auth.models import User
+
+try:
+    from stepic_web.ask.qa.models import Question, Answer
+except ImportError:
+    import sys
+    sys.path.append("/home/box")
+    from web.ask.qa.models import Question, Answer
 
 
 class AskForm(forms.Form):
-    title = forms.CharField(max_length=255)
-    text = forms.CharField(widget=forms.Textarea)
+    title = forms.CharField(min_length=1)
+    text = forms.CharField(min_length=1, widget=forms.Textarea)
+
+    def __init__(self, user=None, **kwargs):
+        self.user = user
+        super(AskForm, self).__init__(kwargs)
 
     def save(self):
-        #self.cleaned_data['author'] =
+        self.cleaned_data["author"] = self.user
         question = Question(**self.cleaned_data)
-        question.author = self._user
         question.save()
         return question
 
 
 class AnswerForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea)
-    question = forms.IntegerField(widget=forms.HiddenInput())
+    text = forms.CharField(min_length=1, widget=forms.Textarea)
+    question = forms.IntegerField()
+
+    def __init__(self, user=None, **kwargs):
+        self.user = user
+        super(AnswerForm, self).__init__(kwargs)
 
     def clean_question(self):
-        return Question.objects.get(pk=int(self.cleaned_data['question']))
+        question_qs = Question.objects.filter(id=self.cleaned_data["question"])
+        if len(question_qs) == 1:
+            return question_qs[0]
+        else:
+            raise forms.ValidationError("Strange question")
 
     def save(self):
+        self.cleaned_data["author"] = self.user
         answer = Answer(**self.cleaned_data)
-        answer.author = self._user
         answer.save()
         return answer
 
 
-class Signup(forms.Form):
-    username = forms.CharField(max_length=100)
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+class SignupForm(forms.Form):
+    username = forms.CharField(min_length=1)
+    email = forms.EmailField(required=False)
+    password = forms.CharField(min_length=1, widget=forms.PasswordInput)
 
     def save(self):
         user = User.objects.create_user(**self.cleaned_data)
-        #user.save()
+        user.save()
         return user
 
 
-class Login(forms.Form):
-    username = forms.CharField(max_length=100)
-    password = forms.CharField(widget=forms.PasswordInput)
+class LoginForm(forms.Form):
+    username = forms.CharField(min_length=1)
+    password = forms.CharField(min_length=1, widget=forms.PasswordInput)
+
+
+if __name__ == '__main__':
+    pass

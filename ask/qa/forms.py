@@ -8,12 +8,12 @@ class AskForm(forms.Form):
   title = forms.CharField(min_length=1)
   text = forms.CharField(min_length=1, widget=forms.Textarea)
 
-  # def __init__(self, user=None, **kwargs):
-  #   self._user = user
-  #   super(AskForm, self).__init__(**kwargs)
+  def __init__(self, user=None, **kwargs):
+    self._user = user
+    super(AskForm, self).__init__(**kwargs)
 
-  def __init__(self, *args, **kwargs):
-    super(AskForm, self).__init__(*args, **kwargs)
+  # def __init__(self, *args, **kwargs):
+  #   super(AskForm, self).__init__(*args, **kwargs)
 
   def save(self):
     self.cleaned_data['author'] = self.user

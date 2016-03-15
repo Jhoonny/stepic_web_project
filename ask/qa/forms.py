@@ -5,17 +5,15 @@ from django import forms
 
 
 class AskForm(forms.Form):
-  title = forms.CharField(max_length=255)
-  text = forms.CharField(widget=forms.Textarea)
+  title = forms.CharField(min_length=1)
+  text = forms.CharField(min_length=1, widget=forms.Textarea)
 
   # def __init__(self, user=None, **kwargs):
   #   self._user = user
   #   super(AskForm, self).__init__(**kwargs)
+
   def __init__(self, *args, **kwargs):
     super(AskForm, self).__init__(*args, **kwargs)
-
-  # def clean(self):
-  #   cleaned_data = super(AskForm, self).clean()
 
   # def save(self):
   #   self.cleaned_data['author'] = self.user

@@ -17,7 +17,7 @@ class Question(models.Model):
 class Answer(models.Model):
   text = models.TextField()
   added_at = models.DateField(null=True, auto_now_add=True)
-  question = models.ForeignKey(Question, null=True)
+  question = models.ForeignKey(Question, null=True, default=1)
   author = models.ForeignKey(User, null=True, default=1)
 
   def __unicode__(self):

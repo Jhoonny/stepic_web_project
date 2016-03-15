@@ -1,8 +1,17 @@
-# ask URL Configuration
-from django.conf.urls import url, include, patterns
-from django.contrib import admin
+from django.conf.urls import patterns, include, url
 
-urlpatterns = [
-  url(r'^', include('qa.urls')),
-  url(r'^admin/', admin.site.urls),
-]
+from django.contrib import admin
+admin.autodiscover()
+
+from qa import views
+
+urlpatterns = patterns('',
+    url(r'^$', views.index, name='index'),
+    url(r'^login/', views.auth_login),
+    url(r'^signup/', views.signup),
+    url(r'^question/(?P<id>\d+)/$', views.detail, name='detail'),
+    url(r'^ask/', views.add_question),
+    url(r'^answer/', views.add_answer),
+    url(r'^popular/', views.popular),
+    url(r'^new/', views.test),
+)

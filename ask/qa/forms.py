@@ -1,67 +1,45 @@
-from django.contrib.auth.models import User
-
-from .models import Answer, Question
 from django import forms
+from qa.models import Question, Answer
+from django.contrib.auth.models import User
 
 
 class AskForm(forms.Form):
-  title = forms.CharField(max_length=255)
-  text = forms.CharField(widget=forms.Textarea)
+    title = forms.CharField(max_length=255)
+    text = forms.CharField(widget=forms.Textarea)
 
-  # def __init__(self, user=None, **kwargs):
-  #   self._user = user
-  #   super(AskForm, self).__init__(**kwargs)
-  def __init__(self, *args, **kwargs):
-    super(AskForm, self).__init__(*args, **kwargs)
-
-  # def clean(self):
-  #   cleaned_data = super(AskForm, self).clean()
-
-  # def save(self):
-  #   self.cleaned_data['author'] = self.user
-  #   return Question.objects.create(**self.cleaned_data)
-
-  def save(self):
-    self.cleaned_data["author"] = self.user
-    question = Question(**self.cleaned_data)
-    question.save()
-    return question
+    def save(self):
+        #self.cleaned_data['author'] =
+        question = Question(**self.cleaned_data)
+        question.author = self._user
+        question.save()
+        return question
 
 
 class AnswerForm(forms.Form):
-  text = forms.CharField(widget=forms.Textarea)
-  question = forms.ModelChoiceField(queryset=Question.objects.all())
+    text = forms.CharField(widget=forms.Textarea)
+    question = forms.IntegerField(widget=forms.HiddenInput())
 
-  # def __init__(self, user=None, **kwargs):
-  #   self._user = user
-  #   super(AnswerForm, self).__init__(**kwargs)
-  def __init__(self, *args, **kwargs):
-    super(AnswerForm, self).__init__(*args, **kwargs)
+    def clean_question(self):
+        return Question.objects.get(pk=int(self.cleaned_data['question']))
 
-  # def clean(self):
-  #   cleaned_data = super(AnswerForm, self).clean()
-
-  # def save(self):
-  #   self.cleaned_data['author'] = self.user
-  #   return Answer.objects.create(**self.cleaned_data)
-  def save(self):
-    self.cleaned_data["author"] = self.user
-    answer = Answer(**self.cleaned_data)
-    answer.save()
-    return answer
+    def save(self):
+        answer = Answer(**self.cleaned_data)
+        answer.author = self._user
+        answer.save()
+        return answer
 
 
-class SignupForm(forms.Form):
-  username = forms.CharField(min_length=1)
-  email = forms.EmailField(required=False)
-  password = forms.CharField(min_length=1, widget=forms.PasswordInput)
+class Signup(forms.Form):
+    username = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
 
-  def save(self):
-    user = User.objects.create_user(**self.cleaned_data)
-    user.save()
-    return user
+    def save(self):
+        user = User.objects.create_user(**self.cleaned_data)
+        #user.save()
+        return user
 
 
-class LoginForm(forms.Form):
-  username = forms.CharField(min_length=1)
-  password = forms.CharField(min_length=1, widget=forms.PasswordInput)
+class Login(forms.Form):
+    username = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput)

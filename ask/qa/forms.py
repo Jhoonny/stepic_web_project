@@ -15,15 +15,9 @@ class AskForm(forms.Form):
   def __init__(self, *args, **kwargs):
     super(AskForm, self).__init__(*args, **kwargs)
 
-  # def save(self):
-  #   self.cleaned_data['author'] = self.user
-  #   return Question.objects.create(**self.cleaned_data)
-
   def save(self):
-    self.cleaned_data["author"] = self.user
-    question = Question(**self.cleaned_data)
-    question.save()
-    return question
+    self.cleaned_data['author'] = self.user
+    return Question.objects.create(**self.cleaned_data)
 
 
 class AnswerForm(forms.Form):

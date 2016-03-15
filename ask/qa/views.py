@@ -101,12 +101,12 @@ def one_quest(request, id):
 @csrf_protect
 def ask_add(request):
   if request.method == 'POST':
-    # form = AskForm(request.POST)
-    # form._user = request.user
-    user = request.user
-    text = request.POST['text']
-    title = request.POST['title']
-    form = AskForm(user, text=text, title=title)
+    form = AskForm(request.POST)
+    form._user = request.user
+    # user = request.user
+    # text = request.POST['text']
+    # title = request.POST['title']
+    # form = AskForm(user, text=text, title=title)
 
     if form.is_valid():
       ask = form.save()

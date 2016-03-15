@@ -1,15 +1,14 @@
-from django.conf.urls import url
+from django.conf.urls import patterns, include, url
+from qa import views
 
-from . import views
 
-urlpatterns = [
-    url(r'^$', views.index),
-    url(r'^login/', views.login_user),
-    url(r'^signup/', views.signup),
-    url(r'^question/(?P<id>[^/]+)', views.one_quest),
-    url(r'^popular/', views.popular_quests),
-    url(r'^new/', views.test),
-    url(r'^ask/', views.ask_add),
-    url(r'^answer/', views.answer_add),
-    url(r'^logout/', views.logout_user),
-]
+urlpatterns = patterns('',
+    # ex: /polls/
+    url(r'^$', views.index, name='index'),
+    # ex: /polls/5/
+    url(r'^(?P<poll_id>\d+)/$', views.detail, name='detail'),
+    # ex: /polls/5/results/
+    url(r'^(?P<poll_id>\d+)/results/$', views.results, name='results'),
+    # ex: /polls/5/vote/
+    url(r'^(?P<poll_id>\d+)/vote/$', views.vote, name='vote'),
+)

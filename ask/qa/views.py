@@ -1,123 +1,130 @@
-from django.shortcuts import render
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.models import User
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404, HttpResponseRedirect
+from django.views.decorators.http import require_GET, require_POST
 
-from .models import Question, Answer
-from .forms import AskForm, AnswerForm
+# Create your views here.
 
+from django.http import HttpResponse
 from django.core.paginator import Paginator
-
-
-def test(request, *args, **kwargs):
-    return HttpResponse("OK")
-
-
-def signup(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = User.objects.create_user(username, email, password)
-
-        user_auth = authenticate(username=username, password=password)
-        login(request, user_auth)
-        return HttpResponseRedirect('/')
-    else:
-        return render(request, 'qa/signup.html')
-
-
-def login_user(request):
-    error = ''
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect('/')
-        else:
-            error = 'Invalid username/password'
-            return HttpResponseRedirect('/login/', {'error': error,})
-    else:
-        return render(request, 'qa/login.html')
-
-
-def logout_user(request):
-    logout(request)
-    return HttpResponseRedirect('/')
+from qa.models import Question, Answer
+from qa.forms import AskForm, AnswerForm, Signup, Login
+from django.contrib.auth import authenticate, login
 
 
 def index(request):
-    quests = Question.objects.order_by('-id')
-    limit = 10
-    paginator = Paginator(quests, limit)
-
+    posts = Question.objects.order_by('-id')
+    limit = request.GET.get('limit', 10)
     page = request.GET.get('page', 1)
-    quests = paginator.page(page)
+    paginator = Paginator(posts, limit)
     paginator.baseurl = '/?page='
+    page = paginator.page(page) # Page
 
-    user = request.user
-
-    return render(request, 'qa/index.html', {
-        'quest_list': quests,
-        'paginator': paginator,
-        'page': page,
-        'user': user,
-    })
-
-
-def popular_quests(request):
-    quests = Question.objects.order_by('-rating')
-    limit = 10
-    paginator = Paginator(quests, limit)
-
-    page = request.GET.get('page', 1)
-    quests = paginator.page(page)
-    paginator.baseurl = '/popular/?page='
-
-    return render(request, 'qa/popular.html', {
-        'quest_list': quests,
+    return render(request, 'last_questions_on_main.html', {
+        'questions': page.object_list,
         'paginator': paginator,
         'page': page,
     })
 
 
-def one_quest(request, id):
-    id = int(id)
+def popular(request):
     try:
-        quest = Question.objects.get(pk=id)
+        posts = Question.objects.order_by('-rating')
     except Question.DoesNotExist:
         raise Http404
-    return render(request, 'qa/details.html', {
-        'quest': quest,
+
+    limit = request.GET.get('limit', 10)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(posts, limit)
+    paginator.baseurl = '/?page='
+    page = paginator.page(page) # Page
+
+    return render(request, 'last_questions_on_main.html', {
+        'questions': page.object_list,
+        'paginator': paginator,
+        'page': page,
     })
 
 
-def ask_add(request):
-    if request.method == 'POST':
+#@require_GET
+def detail(request, id):
+    question = get_object_or_404(Question, id=id)
+    question.answer_set.all()
+
+    return render(request, 'question.html', {
+        'question': question,
+        'form': AnswerForm(initial={'question': question.id}),
+    })
+
+
+def add_question(request):
+    if request.method == "POST":
         form = AskForm(request.POST)
         form._user = request.user
         if form.is_valid():
-            ask = form.save()
-            url = '/question/{0}'.format(ask.id)
+            question = form.save()
+            url = question.get_url()
             return HttpResponseRedirect(url)
     else:
         form = AskForm()
-    return render(request, 'qa/add_ask.html', {
-        'form': form,
+    return render(request, 'ask_form.html', {
+        'form': form
     })
 
 
-def answer_add(request):
-    if request.method == 'POST':
+#@require_POST
+def add_answer(request):
+    url = ''
+    if request.method == "POST":
         form = AnswerForm(request.POST)
+        form._user = request.user
         if form.is_valid():
             answer = form.save()
-            url = '/question/{0}'.format(answer.question_id)
-            return HttpResponseRedirect(url)
+            url = answer.get_url()
+            return redirect('detail', id=answer.question.id)
+        else:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def signup(request):
+    if request.method == "POST":
+        form = Signup(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('index')
     else:
-        form = AnswerForm()
-    return render(request, 'qa/add_answer.html', {
-        'form': form,
+        form = Signup()
+    return render(request, 'user/signup.html', {
+        'form': form
     })
+
+
+def auth_login(request):
+    if request.method == "POST":
+        form = Login(request)
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('index')
+            else:
+                # Return a 'disabled account' error message
+                return render(request, 'login.html',
+                {'form': form, 'message': 'disabled account'})
+        else:
+            # Return an 'invalid login' error message.
+            return render(request, 'login.html',
+            {'form': form, 'message': 'invalid login'})
+    else:
+        form = Login()
+    return render(request, 'user/login.html', {
+        'form': form
+    })
+
+
+
+def test():
+    return "ok"

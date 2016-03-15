@@ -49,6 +49,7 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'ask.urls'
 
+# for new django
 TEMPLATES = [
   {
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -64,6 +65,11 @@ TEMPLATES = [
     },
   },
 ]
+
+# for old django
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR,  'templates'),
+)
 
 WSGI_APPLICATION = 'ask.wsgi.application'
 

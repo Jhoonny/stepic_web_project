@@ -7,18 +7,24 @@ class Question(models.Model):
   text = models.TextField()
   added_at = models.DateField(null=True, auto_now_add=True)
   rating = models.IntegerField(null=True, default=0)
-  author = models.ForeignKey(User, related_name='user_author',  default=1)
-  likes = models.ManyToManyField(User, related_name='user_likes', null=True)
+  author = models.ForeignKey(User, default=1, related_name='+')
+  likes = models.ManyToManyField(User)
 
   def __unicode__(self):
     return self.title
+
+  def get_url(self):
+    return '/question/%d/' % self.pk
 
 
 class Answer(models.Model):
   text = models.TextField()
   added_at = models.DateField(null=True, auto_now_add=True)
-  question = models.ForeignKey(Question,  default=1)
-  author = models.ForeignKey(User,  default=1)
+  question = models.ForeignKey(Question, default=1)
+  author = models.ForeignKey(User, default=1, related_name='+')
 
   def __unicode__(self):
     return self.text
+
+  def get_url(self):
+    return '/question/%s/' % self.question

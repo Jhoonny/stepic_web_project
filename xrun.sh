@@ -5,6 +5,7 @@ sudo chown -R mysql /var/run/mysqld
 sudo /etc/init.d/mysql restart
 
 sudo mysql -uroot -e "create database if not exists ask_db"
+#sudo mysql -uroot -e ""
 sudo mysql -uroot -e "grant all on ask_db.* to 'ask_user'@'localhost' identified by 'ask_pwd'"
 
 python /home/box/web/ask/manage.py syncdb

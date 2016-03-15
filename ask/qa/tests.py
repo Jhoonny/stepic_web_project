@@ -7,9 +7,9 @@ import math
 
 from django.test import TestCase
 
-from stepic_web.ask.qa.management.commands.fill_db import fill_db
-from stepic_web.ask.qa.models import Question, Answer
-from stepic_web.ask.qa.views import build_url, LIMIT
+from .management.commands.fill_db import fill_db
+from .models import Question, Answer
+from .views import build_url, LIMIT
 
 
 class GetQuestionsTest(TestCase):

@@ -10,14 +10,9 @@ from django.http import Http404, HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
-try:
-    from stepic_web.ask.qa.models import Question, Answer
-    from stepic_web.ask.qa.forms import AskForm, AnswerForm, SignupForm, LoginForm
-except ImportError:
-    import sys
-    sys.path.append("/home/box")
-    from web.ask.qa.models import Question, Answer
-    from web.ask.qa.forms import AskForm, AnswerForm, SignupForm, LoginForm
+from .models import Question, Answer
+from .forms import AskForm, AnswerForm, SignupForm, LoginForm
+
 
 LIMIT = 10
 

@@ -16,7 +16,8 @@ class AskForm(forms.Form):
   #   super(AskForm, self).__init__(*args, **kwargs)
 
   def save(self):
-    self.cleaned_data['author'] = self.user
+    # self.cleaned_data['author'] = self.user
+    self.cleaned_data['author'] = '1'
     return Question.objects.create(**self.cleaned_data)
 
 

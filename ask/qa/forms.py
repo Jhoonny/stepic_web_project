@@ -1,4 +1,3 @@
-__author__ = 'User'
 from django import forms
 from models import Question, Answer
 

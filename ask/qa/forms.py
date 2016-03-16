@@ -24,11 +24,12 @@ class AnswerForm(forms.Form):
   text = forms.CharField(widget=forms.Textarea)
   question = forms.ModelChoiceField(queryset=Question.objects.all())
 
-  # def __init__(self, user=None, **kwargs):
-  #   self._user = user
-  #   super(AnswerForm, self).__init__(**kwargs)
-  def __init__(self, *args, **kwargs):
-    super(AnswerForm, self).__init__(*args, **kwargs)
+  def __init__(self, user=None, **kwargs):
+    self._user = user
+    super(AnswerForm, self).__init__(**kwargs)
+
+  # def __init__(self, *args, **kwargs):
+  #   super(AnswerForm, self).__init__(*args, **kwargs)
 
   # def clean(self):
   #   cleaned_data = super(AnswerForm, self).clean()

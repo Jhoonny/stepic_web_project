@@ -101,7 +101,7 @@ def one_quest(request, id):
 @csrf_protect
 def ask_add(request):
   if request.method == 'POST':
-    form = AskFormm(request.POST)
+    form = AskForm(request.POST)
     form._user = request.user
     # user = request.user
     # text = request.POST['text']

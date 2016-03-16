@@ -6,7 +6,7 @@ CONFIG = {
         '--bind=0.0.0.0:8000',
         '--workers=16',
         '--timeout=60',
-        '--log-file=/home/box/web/error_logs.log',
+        '--log-file=/home/box/web/error_log.log',
         'hello:wsgi_app',
     ),
 }

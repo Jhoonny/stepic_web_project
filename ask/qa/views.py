@@ -28,7 +28,7 @@ def answer_add(request):
   form = AnswerForm(request.POST)
   if form.is_valid():
     answer = form.save()
-    url = reverse('question_detail', args=[answer.question.id])
+    url = reverse('question_details', args=[answer.question.id])
     return HttpResponseRedirect(url)
   return HttpResponseRedirect('/')
 

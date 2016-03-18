@@ -22,17 +22,17 @@ def ask_view(request):
       return HttpResponseRedirect(url)
   else:
     form = AskForm()
-  return render(request, 'questions/ask_form.html', { 'form': form })
+  return render(request, 'questions/ask_form.html', {'form': form})
 
 def answer_add(request):
   form = AnswerForm(request.POST)
   if form.is_valid():
     answer = form.save()
-    url = reverse('question_detail', args=[answer.question.id])
+    url = reverse('question_details', args=[answer.question.id])
     return HttpResponseRedirect(url)
   return HttpResponseRedirect('/')
 
-def pagination(request,questions,baseurl):
+def pagination(request, questions, baseurl):
   try:
     limit = int(request.GET.get('limit', 10))
   except ValueError:
@@ -49,12 +49,12 @@ def pagination(request,questions,baseurl):
     page = paginator.page(page)
   except EmptyPage:
     page = paginator.page(paginator.num_pages)
-  return (page,paginator)
+  return page, paginator
 
 def questions_list_all(request):
     questions = Question.objects.all()
     questions = Question.objects.order_by('-added_at')
-    page,paginator=pagination(request,questions,'/?page=')
+    page, paginator = pagination(request, questions, '/?page=')
     return render(request, 'questions/new_questions.html', {
         'questions': page.object_list,
         'page': page,
@@ -64,7 +64,7 @@ def questions_list_all(request):
 def questions_list_popular(request):
     questions = Question.objects.all()
     questions = Question.objects.order_by('-rating')
-    page,paginator=pagination(request,questions,'/popular/?page=')
+    page, paginator = pagination(request, questions, '/popular/?page=')
     return render(request, 'questions/popular_questions.html', {
         'questions': page.object_list,
         'page': page,
@@ -126,9 +126,10 @@ def login(request):
 
 def test(request, *args, **kwargs):
     #return HttpResponse('OK')
-    return render(request,'index2.html')
+    return render(request, 'index2.html')
+
 def page404(request, *args, **kwargs):
     raise Http404
 
 def question(request, id):
-   return render(request,'index.html',{'id': id,})
+   return render(request, 'index.html', {'id': id, })

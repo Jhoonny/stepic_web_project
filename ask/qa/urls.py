@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from qa.views import test, page404, question_details, questions_list_all, questions_list_popular, ask_view, answer_add, signup, login
+from .views import test, page404, question_details, questions_list_all, questions_list_popular, ask_view, answer_add, signup, login
 from django.contrib import admin
 
 urlpatterns = patterns('',

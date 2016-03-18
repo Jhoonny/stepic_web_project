@@ -24,6 +24,7 @@ def ask_view(request):
     form = AskForm()
   return render(request, 'questions/ask_form.html', {'form': form})
 
+
 def answer_add(request):
   form = AnswerForm(request.POST)
   if form.is_valid():
@@ -31,6 +32,7 @@ def answer_add(request):
     url = reverse('question_details', args=[answer.question.id])
     return HttpResponseRedirect(url)
   return HttpResponseRedirect('/')
+
 
 def pagination(request, questions, baseurl):
   try:
@@ -51,25 +53,28 @@ def pagination(request, questions, baseurl):
     page = paginator.page(paginator.num_pages)
   return page, paginator
 
+
 def questions_list_all(request):
-    questions = Question.objects.all()
-    questions = Question.objects.order_by('-added_at')
-    page, paginator = pagination(request, questions, '/?page=')
-    return render(request, 'questions/new_questions.html', {
-        'questions': page.object_list,
-        'page': page,
-        'paginator': paginator,
-    })
+  questions = Question.objects.all()
+  questions = Question.objects.order_by('-added_at')
+  page, paginator = pagination(request, questions, '/?page=')
+  return render(request, 'questions/new_questions.html', {
+    'questions': page.object_list,
+    'page': page,
+    'paginator': paginator,
+  })
+
 
 def questions_list_popular(request):
-    questions = Question.objects.all()
-    questions = Question.objects.order_by('-rating')
-    page, paginator = pagination(request, questions, '/popular/?page=')
-    return render(request, 'questions/popular_questions.html', {
-        'questions': page.object_list,
-        'page': page,
-        'paginator': paginator,
-    })
+  questions = Question.objects.all()
+  questions = Question.objects.order_by('-rating')
+  page, paginator = pagination(request, questions, '/popular/?page=')
+  return render(request, 'questions/popular_questions.html', {
+    'questions': page.object_list,
+    'page': page,
+    'paginator': paginator,
+  })
+
 
 def question_details(request, id):
   try:
@@ -80,10 +85,11 @@ def question_details(request, id):
       form._user = request.user
       if form.is_valid():
         answer = form.save()
-        url = question.get_url()
+        # url = question.get_url()
+        url = answer.get_url()
         return HttpResponseRedirect(url)
     else:
-      answer_form = AnswerForm(initial = {'question': question, 'author': request.user})
+      answer_form = AnswerForm(initial={'question': question, 'author': request.user})
   except Question.DoesNotExist:
     raise Http404
 
@@ -93,43 +99,48 @@ def question_details(request, id):
     'answers': answers,
   })
 
+
 def signup(request):
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
-            form.save()
-            user = authenticate(username=username, password=password)
-            auth_login(request, user)
-            return HttpResponseRedirect('/')
-    else:
-        form = SignUpForm()
-    return render(request, 'questions/signup.html', {
-        'form': form
-    })
+  if request.method == "POST":
+    form = SignUpForm(request.POST)
+    if form.is_valid():
+      username = request.POST['username']
+      password = request.POST['password']
+      form.save()
+      user = authenticate(username=username, password=password)
+      auth_login(request, user)
+      return HttpResponseRedirect('/')
+  else:
+    form = SignUpForm()
+  return render(request, 'questions/signup.html', {
+    'form': form
+  })
+
 
 def login(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(username=username, password=password)
-            auth_login(request, user)
-            return HttpResponseRedirect('/')
-    else:
-        form = LoginForm()
-    return render(request, 'questions/login.html', {
-        'form': form
-    })
+  if request.method == "POST":
+    form = LoginForm(request.POST)
+    if form.is_valid():
+      username = request.POST['username']
+      password = request.POST['password']
+      user = authenticate(username=username, password=password)
+      auth_login(request, user)
+      return HttpResponseRedirect('/')
+  else:
+    form = LoginForm()
+  return render(request, 'questions/login.html', {
+    'form': form
+  })
+
 
 def test(request, *args, **kwargs):
-    #return HttpResponse('OK')
-    return render(request, 'index2.html')
+  # return HttpResponse('OK')
+  return render(request, 'index2.html')
+
 
 def page404(request, *args, **kwargs):
-    raise Http404
+  raise Http404
+
 
 def question(request, id):
-   return render(request, 'index.html', {'id': id, })
+  return render(request, 'index.html', {'id': id,})

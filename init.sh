@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
-#sudo apt-get update
-#sudo apt-get install nginx
-sudo /etc/init.d/nginx start
-ps -o pid,euser,egroup,comm,args -C nginx
 
-sudo ln -s /home/box/web/etc/nginx.conf  /etc/nginx/sites-enabled/test.conf
-sudo rm /etc/nginx/sites-enabled/default
-sudo /etc/init.d/nginx restart
-#sudo /etc/init.d/nginx stop
+#apt-get remove python-django
+#apt-get install python-mysqldb
 
-sudo ln -s /home/box/web/hello.py   /etc/gunicorn.d/test
-sudo /etc/init.d/gunicorn restart
+#pip install --upgrade Django
+echo 'Django version'
+python -c "import django; print(django.get_version())"
+#echo 'Django installation path'
+#python -c "import django; print(django.__path__)"
 
-gunicorn -D -c /home/box/web/hello.py hello:app
+rm -f /etc/nginx/sites-enabled/default 
 
-cd /home/box/web/ask
-gunicorn -D ask.wsgi:application --bind 0.0.0.0:8000
+rm -f /etc/gunicorn.d/test
+ln -sf /home/box/web/etc/gunicorn.conf   /etc/gunicorn.d/test
+
+rm -f /etc/gunicorn.d/ask
+ln -sf /home/box/web/etc/gunicorn_ask.conf   /etc/gunicorn.d/ask
+/etc/init.d/gunicorn restart
+
+ln -sf /home/box/web/etc/nginx.conf  /etc/nginx/sites-enabled/test.conf
+/etc/init.d/nginx restart

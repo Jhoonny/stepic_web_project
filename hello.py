@@ -1,23 +1,9 @@
-__author__ = 'User'
-import wsgiref.handlers
-
-bind = '0.0.0.0:8080'
-
-pythonpath= "/home/box/web"
-
+from cgi import parse_qs
+import string
 
 def app(environ, start_response):
-    status = '200 OK'
-    headers = [
-    ('Content-Type', 'text/plain')
-    ]
-
-    body = ''
-    if environ['REQUEST_METHOD'] == 'GET' and environ['QUERY_STRING']:
-        query = environ['QUERY_STRING'].split('&');
-        for param in query:
-            body += param + '\n'
-
-
-    start_response(status, headers)
-    return [ body ]
+  if environ['REQUEST_METHOD'] == 'GET':
+    body = string.replace(environ['QUERY_STRING'], '&', '\r\n')
+    print(body);
+    start_response('200 OK', [('Content-Type', 'text/plain')]  )
+    yield body

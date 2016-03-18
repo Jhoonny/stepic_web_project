@@ -85,8 +85,8 @@ def question_details(request, id):
       form._user = request.user
       if form.is_valid():
         answer = form.save()
-        # url = question.get_url()
-        url = answer.get_url()
+        url = question.get_url()
+        # url = answer.get_url()
         return HttpResponseRedirect(url)
     else:
       answer_form = AnswerForm(initial={'question': question, 'author': request.user})

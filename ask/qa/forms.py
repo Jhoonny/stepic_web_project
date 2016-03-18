@@ -17,9 +17,12 @@ class AskForm(forms.Form):
 
   def save(self):
     # self.cleaned_data['author'] = self.user
-    self.cleaned_data['author'] = '1'
-    return Question.objects.create(**self.cleaned_data)
-
+    # self.cleaned_data['author'] = '1'
+    # return Question.objects.create(**self.cleaned_data)
+    question = Question(**self.cleaned_data)
+    question.author_id = 1
+    question.save()
+    return question
 
 class AnswerForm(forms.Form):
   text = forms.CharField(widget=forms.Textarea)

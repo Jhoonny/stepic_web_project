@@ -6,67 +6,68 @@ from .models import Question
 from .models import Answer
 
 
-
 class AskForm(forms.Form):
-    title = forms.CharField(max_length=255)
-    text = forms.CharField(widget=forms.Textarea)
+  title = forms.CharField(max_length=255)
+  text = forms.CharField(widget=forms.Textarea)
 
-    def clean_title(self):
-        title = self.cleaned_data['title']
-        if title.strip() == '':
-            raise forms.ValidationError(u'Title is empty', code='invalid')
-        return title
+  def clean_title(self):
+    title = self.cleaned_data['title']
+    if title.strip() == '':
+      raise forms.ValidationError(u'Title is empty', code='invalid')
+    return title
 
-    def clean_text(self):
-        text = self.cleaned_data['text']
-        if text.strip() == '':
-            raise forms.ValidationError(u'Text is empty', code='invalid')
-        return text
+  def clean_text(self):
+    text = self.cleaned_data['text']
+    if text.strip() == '':
+      raise forms.ValidationError(u'Text is empty', code='invalid')
+    return text
 
-    def save(self):
-        #self.cleaned_data['author_id'] = 1
-        ask = Question(**self.cleaned_data)
-        ask.author = self._user
-        ask.save()
-        return ask
+  def save(self):
+    # self.cleaned_data['author_id'] = 1
+    ask = Question(**self.cleaned_data)
+    ask.author = self._user
+    ask.save()
+    return ask
 
 
 class AnswerForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea)
-    question = forms.IntegerField(widget=forms.HiddenInput)
+  text = forms.CharField(widget=forms.Textarea)
+  question = forms.IntegerField(widget=forms.HiddenInput)
 
-    def clean_text(self):
-        text = self.cleaned_data['text']
-        if text.strip() == '':
-            raise forms.ValidationError(u'Text is empty', code='invalid')
-        return text
+  def clean_text(self):
+    text = self.cleaned_data['text']
+    if text.strip() == '':
+      raise forms.ValidationError(u'Text is empty', code='invalid')
+    return text
 
-    def clean_question(self):
-        question = self.cleaned_data['question']
-        if question == 0:
-            raise forms.ValidationError(u'Question number incorrect',
-                                        code='invalid')
-        return question
+  def clean_question(self):
+    question = self.cleaned_data['question']
+    if question == 0:
+      raise forms.ValidationError(u'Question number incorrect',
+                                  code='invalid')
+    return question
 
-    def save(self):
-        self.cleaned_data['question'] = get_object_or_404(
-            Question, pk=self.cleaned_data['question'])
-        #self.cleaned_data['author_id'] = 1
-        answer = Answer(**self.cleaned_data)
-        answer.author = self._user
-        answer.save()
-        return answer
+  def save(self):
+    self.cleaned_data['question'] = get_object_or_404(
+      Question, pk=self.cleaned_data['question'])
+    # self.cleaned_data['author_id'] = 1
+    answer = Answer(**self.cleaned_data)
+    answer.author = self._user
+    answer.save()
+    return answer
+
 
 class SignUpForm(forms.Form):
-    username = forms.CharField(max_length=100)
-    email = forms.EmailField(max_length=100)
-    password = forms.CharField(max_length=100)
+  username = forms.CharField(max_length=100)
+  email = forms.EmailField(max_length=100)
+  password = forms.CharField(max_length=100)
 
-    def save(self):
-        user = User.objects.create_user(**self.cleaned_data)
-        user.save()
-        return user
+  def save(self):
+    user = User.objects.create_user(**self.cleaned_data)
+    user.save()
+    return user
+
 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=100)
-    password = forms.CharField(max_length=100)
+  username = forms.CharField(max_length=100)
+  password = forms.CharField(max_length=100)

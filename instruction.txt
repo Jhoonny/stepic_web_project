@@ -1,0 +1,25 @@
+1. sudo apt-get update
+2. sudo apt-get upgrade
+3. sudo apt-get remove python-django
+4. sudo pip insall django
+5. sudo /etc/init.d/mysql start
+6. sudo mysql
+	create database mydatabase;
+7. sudo pip install django-autofixture
+8. git clone .....
+8. cd /home/box/web/ask/
+	sudo python manage.py migrate
+
+9. If test file add between first model import and 'DJANGO_SEETTINGS...'
+sudo nano ser....py
+add
+	import django
+seting
+
+	django.setup()
+
+
+for lesson 2.7
+
+@Elijah_Master в файле servet_117.py или как-то так он называется, замените в строке
+ "assert question.author == user" -  user на user.username. У меня всё заработало

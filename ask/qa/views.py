@@ -1,131 +1,107 @@
-from django.shortcuts import render
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+# coding: utf-8
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from models import Question, Answer
+from functions import pagepag
+from forms import AskForm, AnswerForm, SignupForm, LoginForm
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-
-from .models import Question, Answer
-from .forms import AskForm, AnswerForm
-
-from django.core.paginator import Paginator
 
 
 def test(request, *args, **kwargs):
-  return HttpResponse("OK")
+  return HttpResponse('OK')
 
 
-@csrf_protect
-def signup(request):
-  if request.method == 'POST':
-    username = request.POST.get('username')
-    email = request.POST.get('email')
-    password = request.POST.get('password')
-    user = User.objects.create_user(username, email, password)
-
-    user_auth = authenticate(username=username, password=password)
-    login(request, user_auth)
-    return HttpResponseRedirect('/')
-  else:
-    return render(request, 'signup.html')
-
-
-@csrf_protect
-def login_user(request):
-  error = ''
-  if request.method == 'POST':
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    user = authenticate(username=username, password=password)
-    if user is not None:
-      login(request, user)
-      return HttpResponseRedirect('/')
-    else:
-      error = 'Invalid username/password'
-      return HttpResponseRedirect('/login/', {'error': error,})
-  else:
-    return render(request, 'login.html')
-
-
-def logout_user(request):
-  logout(request)
-  return HttpResponseRedirect('/')
-
-
-def index(request):
-  quests = Question.objects.order_by('-id')
-  limit = 10
-  paginator = Paginator(quests, limit)
-
-  page = request.GET.get('page', 1)
-  quests = paginator.page(page)
-  paginator.baseurl = '/?page='
-
-  user = request.user
-
+def basetemp(request, url, order='-added_ad'):
+  questions = Question.objects.all()
+  questions = questions.order_by(order)
+  [paginator, page] = pagepag(request, questions, url)
   return render(request, 'index.html', {
-    'quest_list': quests,
+    'questions': page.object_list,
     'paginator': paginator,
     'page': page,
-    'user': user,
-  })
+    'user': request.user,
+  }, )
 
 
-def popular_quests(request):
-  quests = Question.objects.order_by('-rating')
-  limit = 10
-  paginator = Paginator(quests, limit)
-
-  page = request.GET.get('page', 1)
-  quests = paginator.page(page)
-  paginator.baseurl = '/popular/?page='
-
-  return render(request, 'popular.html', {
-    'quest_list': quests,
-    'paginator': paginator,
-    'page': page
-  })
+def questpage(request, slug):
+  question = get_object_or_404(Question, pk=slug)
+  return render(request, 'quest.html', {
+    'question': question,
+    'answers': Answer.objects.filter(question=slug).order_by('-added_ad')[:],
+    'newanswer': AnswerForm({'question': int(slug), 'author': request.user}),
+  }, )
 
 
-@csrf_protect
-def one_quest(request, id):
-  id = int(id)
-  try:
-    quest = Question.objects.get(pk=id)
-  except Question.DoesNotExist:
-    raise Http404
-  return render(request, 'details.html', {
-    'quest': quest
-  })
+def askform(request):
+  url = '/question/'
+  if request.method == "POST":
+    if request.POST.get('author'):
+      author = request.POST.get('author')
+    else:
+      author = request.user
+    ask = AskForm({
+      'title': request.POST['title'],
+      'text': request.POST['text'],
+      'author': author,
+    }, )
+    if ask.is_valid():
+      url = url + str(ask.save()) + '/'
+    return HttpResponseRedirect(url)
+  ask = AskForm({'author': request.user})
+  return render(request, 'ask.html', {
+    'ask': ask,
+  }, )
 
 
-@csrf_protect
-def ask_add(request):
+def newanswer(request):
+  url = '/question/'
+  if request.method == "POST":
+    newanswer = AnswerForm(request.POST)
+    if newanswer.is_valid():
+      url = url + str(newanswer.save()) + '/'
+  return HttpResponseRedirect(url)
+
+
+def signupform(request):
+  if request.method == "POST":
+    signup = SignupForm(request.POST)
+    if signup.is_valid():
+      signup = signup.save()
+      loguser = LoginForm(request.POST)
+      if loguser.is_valid():
+        loguser = loguser.input()
+        if loguser is not None:
+          login(request, loguser)
+      else:
+        return HttpResponse('Invalid Data')
+      return HttpResponseRedirect('/')
+  return render(request, 'signup.html', {
+    'signup': SignupForm(),
+    'header': 'Зарегистрируйтесь',
+    'url': 'signup'
+  }, )
+
+
+def loginform(request):
   if request.method == 'POST':
-    form = AskForm(request.POST)
-    form._user = request.user
-    if form.is_valid():
-      ask = form.save()
-      url = '/question/{0}'.format(ask.id)
-      # url = ask.get_url()
-      return HttpResponseRedirect(url)
-  else:
-    form = AskForm()
-  return render(request, 'add_ask.html', {
-    'form': form
-  })
+    loguser = LoginForm(request.POST)
+    if loguser.is_valid():
+      loguser = loguser.input()
+      if loguser is not None:
+        login(request, loguser)
+      else:
+        return HttpResponse('Not wright login or password')
+      return HttpResponseRedirect('/')
+    else:
+      return HttpResponse('Invalid Data')
+  return render(request, 'signup.html', {
+    'signup': LoginForm(),
+    'header': 'Войдите на сайт',
+    'url': 'login',
+  }, )
 
 
-@csrf_protect
-def answer_add(request):
-  if request.method == 'POST':
-    form = AnswerForm(request.POST)
-    if form.is_valid():
-      answer = form.save()
-      url = '/question/{0}'.format(answer.question_id)
-      # url = answer.get_url()
-      return HttpResponseRedirect(url)
-  else:
-    form = AnswerForm()
-  return render(request, 'add_answer.html', {
-    'form': form
-  })
+def logoutPage(request):
+  logout(request)
+  return HttpResponseRedirect('/')

@@ -1,14 +1,8 @@
-def wsgi_app(env, start_response):
-
-
-  status = '200 OK'
-  header = [('Content-Type', 'text/plain')]
-
-  body = []
-  for key in env['QUERY_STRING'].split('&'):
-    data = key + "\n"
-    body.append(data)
-
-
-  start_response(status, header)
-  return body
+def app (environ, start_response):
+	status = '200 OK'
+	headers = [
+		('Content-Type', 'text/plain')
+	]
+	body = environ['QUERY_STRING'].replace('&','\r\n')
+	start_response(status, headers)
+	return [body]

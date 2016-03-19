@@ -9,13 +9,19 @@
 8. git clone .....
 8. cd /home/box/web/ask/
 	sudo python manage.py migrate
+
 9. If test file add between first model import and 'DJANGO_SEETTINGS...'
+sudo nano ser....py
+add
 	import django
 seting
 
 	django.setup()
 
-
+/////
 python manage.py shell
 from django.contrib.auth.models import User
 user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword').save().
+/////
+@Elijah_Master в файле servet_117.py или как-то так он называется, замените в строке
+ "assert question.author == user" -  user на user.username. У меня всё заработало

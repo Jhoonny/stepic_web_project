@@ -10,4 +10,11 @@
 	sudo python manage.py migrate
 9. If test file add between first model import and 'DJANGO_SEETTINGS...'
 	import django
+seting
+
 	django.setup()
+
+
+python manage.py shell
+from django.contrib.auth.models import User
+user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword').save().

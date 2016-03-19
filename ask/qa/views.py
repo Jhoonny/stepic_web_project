@@ -36,10 +36,12 @@ def questpage(request, slug):
 def askform(request):
   url = '/question/'
   if request.method == "POST":
-    if request.POST['author']:
-      author = request.POST['author']
-    else:
-      author = request.user
+    # entry_title = request.POST.get("title", "Guest (or whatever)")
+    author = request.POST.get("author", "Guest")
+    # if request.POST['author']:
+    #   author = request.POST['author']
+    # else:
+    #   author = request.user
     ask = AskForm({
       'title': request.POST['title'],
       'text': request.POST['text'],

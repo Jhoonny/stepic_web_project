@@ -1,9 +1,8 @@
-from cgi import parse_qs
-import string
-
-def app(environ, start_response):
-  if environ['REQUEST_METHOD'] == 'GET':
-    body = string.replace(environ['QUERY_STRING'], '&', '\r\n')
-    print(body);
-    start_response('200 OK', [('Content-Type', 'text/plain')]  )
-    yield body
+def app (environ, start_response):
+	status = '200 OK'
+	headers = [
+		('Content-Type', 'text/plain')
+	]
+	body = environ['QUERY_STRING'].replace('&','\r\n')
+	start_response(status, headers)
+	return [body]

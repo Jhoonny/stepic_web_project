@@ -1,72 +1,46 @@
-from django.shortcuts import get_object_or_404
-from django import forms
-from django.forms import ModelForm
-from django.contrib.auth.models import User
-from .models import Question
-from .models import Answer
+# coding: utf-8
 
+from django import forms
+from qa.models import Question, Answer
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 class AskForm(forms.Form):
-  title = forms.CharField(max_length=255)
-  text = forms.CharField(widget=forms.Textarea)
-
-  def clean_title(self):
-    title = self.cleaned_data['title']
-    if title.strip() == '':
-      raise forms.ValidationError(u'Title is empty', code='invalid')
-    return title
-
-  def clean_text(self):
-    text = self.cleaned_data['text']
-    if text.strip() == '':
-      raise forms.ValidationError(u'Text is empty', code='invalid')
-    return text
-
-  def save(self):
-    # self.cleaned_data['author_id'] = 1
-    ask = Question(**self.cleaned_data)
-    ask.author = self._user
-    ask.save()
-    return ask
-
+	author = forms.CharField(label='Ваше Имя', max_length=255)
+	title = forms.CharField(label='Заголовок вопроса', max_length=255)
+	text = forms.CharField(label='Текст вопроса', widget=forms.Textarea)
+	
+	def save(self):
+		quest = Question(**self.cleaned_data)
+		quest.save()
+		return quest.pk
 
 class AnswerForm(forms.Form):
-  text = forms.CharField(widget=forms.Textarea)
-  question = forms.IntegerField(widget=forms.HiddenInput)
+	author = forms.CharField(label='Ваше Имя', max_length=255)
+	text = forms.CharField(label='Текст ответа', widget=forms.Textarea)
+	question = forms.IntegerField(widget=forms.HiddenInput)
 
-  def clean_text(self):
-    text = self.cleaned_data['text']
-    if text.strip() == '':
-      raise forms.ValidationError(u'Text is empty', code='invalid')
-    return text
+	def save(self):
+		newanswer = Answer(text=self.cleaned_data['text'], author=self.cleaned_data['author'])
+		newanswer.question = Question.objects.get(pk=self.cleaned_data['question'])
+		newanswer.save()
+		return self.cleaned_data['question']
 
-  def clean_question(self):
-    question = self.cleaned_data['question']
-    if question == 0:
-      raise forms.ValidationError(u'Question number incorrect',
-                                  code='invalid')
-    return question
-
-  def save(self):
-    self.cleaned_data['question'] = get_object_or_404(Question, pk=self.cleaned_data['question'])
-    # self.cleaned_data['author_id'] = 1
-    answer = Answer(**self.cleaned_data)
-    answer.author = self._user
-    answer.save()
-    return answer
-
-
-class SignUpForm(forms.Form):
-  username = forms.CharField(max_length=100)
-  email = forms.EmailField(max_length=100)
-  password = forms.CharField(max_length=100)
-
-  def save(self):
-    user = User.objects.create_user(**self.cleaned_data)
-    user.save()
-    return user
-
+class SignupForm(forms.Form):
+	username = forms.CharField(label="Ваше имя", max_length=255)
+	email = forms.EmailField(label="Ваша почта", widget=forms.EmailInput)
+	password = forms.CharField(label="Ваш пароль", max_length=255, widget=forms.PasswordInput)
+	def save(self):
+		newuser = User.objects.create_user(self.cleaned_data['username'],self.cleaned_data['email'],self.cleaned_data['password'])
+		newuser.save()
+		return newuser
 
 class LoginForm(forms.Form):
-  username = forms.CharField(max_length=100)
-  password = forms.CharField(max_length=100)
+	username = forms.CharField(label="Ваше имя", max_length=255)
+	password = forms.CharField(label="Ваш пароль", max_length=255, widget=forms.PasswordInput)
+	def input(self):
+		user = authenticate(username=self.cleaned_data['username'], password=self.cleaned_data['password'])
+		if user is not None:
+			if user.is_active:
+				return user
+		return None

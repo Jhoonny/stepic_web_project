@@ -1,22 +1,11 @@
-#!/usr/bin/env bash
+sudo rm /etc/nginx/sites-enabled/default
+sudo ln -s /home/box/web/etc/hello.py /etc/gunicorn.d/hello.py
+sudo ln -s /home/box/web/etc/nginx.conf /etc/nginx/sites-enabled/default
 
-#apt-get remove python-django
-#apt-get install python-mysqldb
+cd /home/box/web/
+gunicorn -b 0.0.0.0:8080 -D hello:app
 
-#pip install --upgrade Django
-echo 'Django version'
-python -c "import django; print(django.get_version())"
-#echo 'Django installation path'
-#python -c "import django; print(django.__path__)"
+cd /home/box/web/ask/
+gunicorn ask.wsgi:application --bind 0.0.0.0:8000 -D
 
-rm -f /etc/nginx/sites-enabled/default 
-
-rm -f /etc/gunicorn.d/test
-ln -sf /home/box/web/etc/gunicorn.conf   /etc/gunicorn.d/test
-
-rm -f /etc/gunicorn.d/ask
-ln -sf /home/box/web/etc/gunicorn_ask.conf   /etc/gunicorn.d/ask
-/etc/init.d/gunicorn restart
-
-ln -sf /home/box/web/etc/nginx.conf  /etc/nginx/sites-enabled/test.conf
-/etc/init.d/nginx restart
+sudo /etc/init.d/nginx restart

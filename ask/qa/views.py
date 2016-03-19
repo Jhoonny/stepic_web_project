@@ -1,146 +1,99 @@
+# coding: utf-8
+
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.core.paginator import Paginator, EmptyPage
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login as auth_login
-from django.core.urlresolvers import reverse
-from .models import Question
-from .models import Answer
-from .forms import AskForm
-from .forms import AnswerForm
-from .forms import SignUpForm
-from .forms import LoginForm
-
-
-def ask_view(request):
-  if request.method == 'POST':
-    form = AskForm(request.POST)
-    form._user = request.user
-    if form.is_valid():
-      ask = form.save()
-      url = reverse('question_details', args=[ask.id])
-      return HttpResponseRedirect(url)
-  else:
-    form = AskForm()
-  return render(request, 'questions/ask_form.html', {'form': form})
-
-
-def answer_add(request):
-  form = AnswerForm(request.POST)
-  if form.is_valid():
-    answer = form.save()
-    url = reverse('question_details', args=[answer.question.id])
-    return HttpResponseRedirect(url)
-  return HttpResponseRedirect('/')
-
-
-def pagination(request, questions, baseurl):
-  try:
-    limit = int(request.GET.get('limit', 10))
-  except ValueError:
-    limit = 10
-  if limit > 100:
-    limit = 10
-  try:
-    page = int(request.GET.get('page', 1))
-  except ValueError:
-    raise Http404
-  paginator = Paginator(questions, limit)
-  paginator.baseurl = baseurl
-  try:
-    page = paginator.page(page)
-  except EmptyPage:
-    page = paginator.page(paginator.num_pages)
-  return page, paginator
-
-
-def questions_list_all(request):
-  questions = Question.objects.all()
-  questions = Question.objects.order_by('-added_at')
-  page, paginator = pagination(request, questions, '/?page=')
-  return render(request, 'questions/new_questions.html', {
-    'questions': page.object_list,
-    'page': page,
-    'paginator': paginator,
-  })
-
-
-def questions_list_popular(request):
-  questions = Question.objects.all()
-  questions = Question.objects.order_by('-rating')
-  page, paginator = pagination(request, questions, '/popular/?page=')
-  return render(request, 'questions/popular_questions.html', {
-    'questions': page.object_list,
-    'page': page,
-    'paginator': paginator,
-  })
-
-
-def question_details(request, id):
-  try:
-    question = Question.objects.get(id=id)
-    answers = question.answer_set.all()
-    if request.method == "POST":
-      form = AnswerForm(request.POST)
-      form._user = request.user
-      if form.is_valid():
-        answer = form.save()
-        url = question.get_url()
-        # url = answer.get_url()
-        return HttpResponseRedirect(url)
-    else:
-      answer_form = AnswerForm(initial={'question': question, 'author': request.user})
-  except Question.DoesNotExist:
-    raise Http404
-
-  return render(request, 'questions/question_details.html', {
-    'question': question,
-    'form': answer_form,
-    'answers': answers,
-  })
-
-
-def signup(request):
-  if request.method == "POST":
-    form = SignUpForm(request.POST)
-    if form.is_valid():
-      username = request.POST['username']
-      password = request.POST['password']
-      form.save()
-      user = authenticate(username=username, password=password)
-      auth_login(request, user)
-      return HttpResponseRedirect('/')
-  else:
-    form = SignUpForm()
-  return render(request, 'questions/signup.html', {
-    'form': form
-  })
-
-
-def login(request):
-  if request.method == "POST":
-    form = LoginForm(request.POST)
-    if form.is_valid():
-      username = request.POST['username']
-      password = request.POST['password']
-      user = authenticate(username=username, password=password)
-      auth_login(request, user)
-      return HttpResponseRedirect('/')
-  else:
-    form = LoginForm()
-  return render(request, 'questions/login.html', {
-    'form': form
-  })
-
+from django.http import HttpResponse, HttpResponseRedirect
+from models import Question, Answer
+from functions import pagepag
+from forms import AskForm, AnswerForm, SignupForm, LoginForm
+from django.contrib.auth import login,authenticate, logout
 
 def test(request, *args, **kwargs):
-  # return HttpResponse('OK')
-  return render(request, 'index2.html')
+	return HttpResponse('OK')
 
+def basetemp(request, url, order='-added_ad'):
+	questions = Question.objects.all()
+	questions = questions.order_by(order)
+	[paginator,page] = pagepag(request, questions, url)
+	return render(request, 'index.html', {
+		'questions': page.object_list,
+		'paginator': paginator,
+		'page': page,
+		'user': request.user,
+	},)
 
-def page404(request, *args, **kwargs):
-  raise Http404
+def questpage(request, slug):
+	question = get_object_or_404(Question, pk=slug)
+	return render(request, 'quest.html',{
+		'question': question,
+		'answers': Answer.objects.filter(question=slug).order_by('-added_ad')[:],
+		'newanswer': AnswerForm({'question': int(slug), 'author': request.user}),
+	},)
 
+def askform(request):
+	url = '/question/'
+	if request.method == "POST":
+		if request.POST['author']:
+			author = request.POST['author']
+		else:
+			author = request.user
+		ask = AskForm({
+			'title': request.POST['title'],
+			'text': request.POST['text'],
+			'author': author,
+		},)
+		if ask.is_valid():
+			url = url + str( ask.save() ) + '/'
+		return HttpResponseRedirect(url)
+	ask = AskForm({'author': request.user}) 
+	return render(request, 'ask.html',{
+		'ask': ask,
+	},)
 
-def question(request, id):
-  return render(request, 'index.html', {'id': id,})
+def newanswer(request):
+	url = '/question/'
+	if request.method == "POST":
+		newanswer = AnswerForm(request.POST)
+		if newanswer.is_valid():
+			url = url + str(newanswer.save()) + '/'
+	return HttpResponseRedirect(url) 
+
+def signupform(request):
+	if request.method == "POST":
+		signup = SignupForm(request.POST)
+		if signup.is_valid():
+			signup = signup.save()
+			loguser = LoginForm(request.POST)
+			if loguser.is_valid():
+				loguser = loguser.input()
+				if loguser is not None:
+					login(request, loguser)
+			else:
+				return HttpResponse('Invalid Data')
+			return HttpResponseRedirect('/')
+	return render(request, 'signup.html', {
+		'signup': SignupForm(),
+		'header': 'Зарегистрируйтесь',
+		'url': 'signup'
+	},)
+
+def loginform(request):
+	if request.method == 'POST':
+		loguser = LoginForm(request.POST)
+		if loguser.is_valid():
+			loguser = loguser.input()
+			if loguser is not None:
+				login(request, loguser)
+			else:
+				return HttpResponse('Not wright login or password')
+			return HttpResponseRedirect('/')
+		else:
+			return HttpResponse('Invalid Data')
+	return render(request, 'signup.html', {
+		'signup': LoginForm(),
+		'header':'Войдите на сайт',
+		'url': 'login',
+	},)
+
+def logoutPage(request):
+	logout(request)
+	return HttpResponseRedirect('/')

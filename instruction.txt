@@ -4,8 +4,9 @@
 4. sudo pip insall django
 5. sudo /etc/init.d/mysql start
 6. sudo mysql
-	create databas mydatabase;
+	create database mydatabase;
 7. sudo pip install django-autofixture
+8. git clone .....
 8. cd /home/box/web/ask/
 	sudo python manage.py migrate
 9. If test file add between first model import and 'DJANGO_SEETTINGS...'

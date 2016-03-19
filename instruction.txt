@@ -18,10 +18,8 @@ seting
 
 	django.setup()
 
-/////
-python manage.py shell
-from django.contrib.auth.models import User
-user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword').save().
-/////
+
+for lesson 2.7
+
 @Elijah_Master в файле servet_117.py или как-то так он называется, замените в строке
  "assert question.author == user" -  user на user.username. У меня всё заработало
